@@ -1,0 +1,12 @@
+[data_path]
+directory = 'C:\Users\BioRehab\Desktop\project'
+
+
+[parameters]
+
+F1 = 'float'
+F2 = 'float'
+F3 = 'float'
+F4 = 'float'
+cop_x = 'float'
+cop_y = 'float'
