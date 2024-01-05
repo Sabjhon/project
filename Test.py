@@ -39,37 +39,6 @@ class MplCanvas(pg.PlotWidget):
 
         self.curve_f1.setData(self.x_data, self.data_f1)
         self.curve_f2.setData(self.x_data, self.data_f2)
-        self.pushButton_3.clicked.connect(self.clear_data)
-
-    def __init__(self, parent=None):
-        super().__init__(parent=parent)
-
-        self.curve_f1 = self.plotItem.plot(pen='r', name="F1")
-        self.curve_f2 = self.plotItem.plot(pen='g', name="F2")
-
-        self.x_data = np.linspace(0, 10, 100)
-        self.data_f1 = [0] * 100
-        self.data_f2 = [0] * 100
-
-        self.curve_f1.setData(self.x_data, self.data_f1)
-        self.curve_f2.setData(self.x_data, self.data_f2)
-
-        self.update_plot_signal.connect(self.update_plot)
-
-    @QtCore.pyqtSlot(float, float)
-    def update_plot(self, f1, f2):
-        self.data_f1 = self.data_f1[1:] + [f1]
-        self.data_f2 = self.data_f2[1:] + [f2]
-
-        self.curve_f1.setData(self.x_data, self.data_f1)
-        self.curve_f2.setData(self.x_data, self.data_f2)
-
-    def clear_data(self):
-        self.data_f1 = [0] * 100
-        self.data_f2 = [0] * 100
-
-        self.curve_f1.setData(self.x_data, self.data_f1)
-        self.curve_f2.setData(self.x_data, self.data_f2)
 
 class WorkerSignals(QtCore.QObject):
     finished = QtCore.pyqtSignal()
@@ -135,13 +104,18 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.serial_port = 'COM3'
         self.worker = Worker(self.serial_port)
-        self.canvas = MplCanvas(parent=self.verticalLayoutWidget)
-        # self.verticalLayout.addWidget(self.canvas)
+        self.mpl_canvases = self.mpl_canvases
         self.worker_thread = None
 
-        self.pushButton.clicked.connect(self.toggle_serial_thread)
-        self.pushButton_3.clicked.connect(self.clear_data)
-        self.pushButton_2.clicked.connect(self.stop_serial_thread)
+        if self.pushButton.clicked.connect(self.start_serial_thread):
+            print("Program Started ")
+        
+        if self.pushButton_3.clicked.connect(self.clear_data):
+            print("Data Cleared ")
+        
+        if self.pushButton_2.clicked.connect(self.stop_serial_thread):
+            print("Program Stopped ")
+
     def toggle_serial_thread(self):
         if not self.worker.is_running:
             self.start_serial_thread()
@@ -152,7 +126,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.worker_thread = QtCore.QThread()
         self.worker.moveToThread(self.worker_thread)
         self.worker_thread.started.connect(self.worker.run, QtCore.Qt.QueuedConnection)
-        self.worker.signals.progress.connect(self.canvas.update_plot_signal.emit)
+
+        # Select the appropriate canvas based on your logic
+        # selected_canvas_index = self.spinBox.value()
+        # if selected_canvas_index >= 0 and selected_canvas_index < len(self.mpl_canvases):
+        #     self.canvas = self.mpl_canvases[selected_canvas_index]
+        #     self.verticalLayout.addWidget(self.canvas)
+
+            # Connect the worker signals to the selected canvas
+        self.worker.signals.progress.connect(self.mpl_canvases[0].update_plot)
+
         self.worker_thread.start()
 
     def stop_serial_thread(self):
@@ -163,10 +146,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.worker_thread = None
 
     def clear_data(self):
-        self.canvas.clear_data()
+        # Clear data on the selected canvas
+        selected_canvas_index = self.spinBox.value()
+        if selected_canvas_index >= 0 and selected_canvas_index < len(self.mpl_canvases):
+            self.canvas = self.mpl_canvases[selected_canvas_index]
+            self.canvas.clear_data()
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = MainWindow()
     MainWindow.show()
     sys.exit(app.exec_())
+    

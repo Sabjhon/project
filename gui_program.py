@@ -71,11 +71,11 @@ class Ui_MainWindow(object):
         self.comboBox.currentIndexChanged.connect(self.update_active_canvas)
         
         # Initialize the canvas using the first one from mpl_canvases, if available
-        if self.mpl_canvases:
-            self.canvas = self.mpl_canvases[0]
-            self.verticalLayout.addWidget(self.canvas)
-        else:
-            self.canvas = None
+        # if self.mpl_canvases:
+        #     self.canvas = self.mpl_canvases[0]
+        #     self.verticalLayout.addWidget(self.canvas)
+        # else:
+        #     self.canvas = None
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -117,14 +117,14 @@ class Ui_MainWindow(object):
             self.mpl_canvases.append(mpl_canvas)
 
 
-        # Update the selected canvas index based on the spin box value
-        selected_canvas_index = self.spinBox.value()
-        if selected_canvas_index >= 0 and selected_canvas_index < len(self.mpl_canvases):
-            # Use an existing canvas from mpl_canvases
-            self.canvas = self.mpl_canvases[selected_canvas_index]
+        # # Update the selected canvas index based on the spin box value
+        # selected_canvas_index = self.spinBox.value()
+        # if selected_canvas_index >= 0 and selected_canvas_index < len(self.mpl_canvases):
 
-            # Add the selected canvas to verticalLayout
-            self.verticalLayout.addWidget(self.canvas)
+        #     self.canvas = self.mpl_canvases[selected_canvas_index]
+
+        #     # Add the selected canvas to verticalLayout
+        #     self.verticalLayout.addWidget(self.canvas)
 
     def update_active_canvas(self):
         selected_index = self.comboBox.currentIndex()
